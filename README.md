@@ -42,7 +42,8 @@ This project is built with Python 3. It is recommended to use a Virtual Environm
 1. Clone the Repository
 
 ```bash
-TO-DO
+git clone https://github.com/Lambru99/TDDT.git
+cd TDDT
 ```
 2. Create a Virtual Environment
 
@@ -168,3 +169,4 @@ GNU General Public License for more details.
 
 
 Happy Hacking! 🕵️‍♂️
+
