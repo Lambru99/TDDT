@@ -1,8 +1,7 @@
+# TDDT
 A modular, Python-based External Attack Surface Management (EASM) tool designed for corporate reconnaissance and OSINT.
 
 This tool automates the gathering of intelligence on target domains, combining Passive OSINT (safe, legal, no-touch) with Active Reconnaissance capabilities. It features a beautiful terminal interface powered by the rich library.
-
----
 
 ## ⚠️ Legal Disclaimer
 
@@ -158,6 +157,14 @@ This project is Open Source (FOSS) and leverages the following powerful Python l
 
 ## 📄 License
 
-This project is licensed under the MIT License. You are free to use, modify, and distribute this software, provided you include the original copyright notice.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
 
 Happy Hacking! 🕵️‍♂️
