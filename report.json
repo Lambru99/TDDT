@@ -1,0 +1,445 @@
+{
+    "target": "caspieonline.eu",
+    "scan_date": "2026-07-28T12:41:08.916712",
+    "mode": "FULL (Active)",
+    "identity": {
+        "raw_output": "% The WHOIS service offered by EURid and the access to the records\n% in the EURid WHOIS database are provided for information purposes\n% only. It allows persons to check whether a specific domain name\n% is still available or not and to obtain information related to\n% the registration records of existing domain names.\n%\n% EURid cannot, under any circumstances, be held liable in case the\n% stored information would prove to be wrong, incomplete or not\n% accurate in any sense.\n%\n% By submitting a query, you agree not to use the information made\n% available to:\n%\n% - allow, enable or otherwise support the transmission of unsolicited,\n%   commercial advertising or other solicitations whether via email or\n%   otherwise;\n% - target advertising in any possible way;\n% - cause nuisance in any possible way by sending messages to registrants,\n%   whether by automated, electronic processes capable of enabling\n%   high volumes or by other possible means.\n%\n% Without prejudice to the above, it is explicitly forbidden to extract,\n% copy and/or use or re-utilise in any form and by any means\n% (electronically or not) the whole or a quantitatively or qualitatively\n% substantial part of the contents of the WHOIS database without prior\n% and explicit permission by EURid, nor in any attempt hereof, to apply\n% automated, electronic processes to EURid (or its systems).\n%\n% You agree that any reproduction and/or transmission of data for\n% commercial purposes will always be considered as the extraction of a\n% substantial part of the content of the WHOIS database.\n%\n% By submitting the query, you agree to abide by this policy and accept\n% that EURid can take measures to limit the use of its WHOIS services\n% to protect the privacy of its registrants or the integrity\n% of the database.\n%\n% The EURid WHOIS service on port 43 (textual WHOIS) never discloses\n% any information concerning the registrant.\n% Registrant and on-site contact information can be obtained through use of the\n% web-based WHOIS service available from the EURid website www.eurid.eu\n%\n% WHOIS caspieonline.eu\nDomain: caspieonline.eu\nScript: LATIN\n\nRegistrant:\n        NOT DISCLOSED!\n        Visit www.eurid.eu for the web-based WHOIS.\n\nTechnical:\n        Organisation: Register S.p.A.\n        Language: it\n        Email: support@register.it\n\nRegistrar:\n        Name: Register S.p.A.\n        Website: https://www.register.it/\n\nName servers:\n        ns2.register.it\n        ns1.register.it\n\nPlease visit www.eurid.eu for more info.\n"
+    },
+    "dns": {
+        "mx": {
+            "records": [
+                "10 caspieonline-eu.mail.protection.outlook.com."
+            ],
+            "provider": "Microsoft 365"
+        },
+        "ns": [
+            "ns2.register.it.",
+            "ns1.register.it."
+        ],
+        "txt": [
+            "\"v=spf1 include:spf.protection.outlook.com -all\""
+        ],
+        "spf": {
+            "found": true,
+            "record": "v=spf1 include:spf.protection.outlook.com -all",
+            "strength": "Fail (-all) \u2014 strict"
+        },
+        "dmarc": {
+            "found": true,
+            "record": "v=DMARC1; p=quarantine; pct=98; rua=mailto:sistemisti@caspieonline.eu; ruf=mailto:sistemisti@caspieonline.eu ",
+            "policy": "quarantine",
+            "strength": "Quarantine \u2014 medium protection"
+        },
+        "ipv6": {
+            "supported": false,
+            "addresses": []
+        },
+        "soa": "ns1.register.it. hostmaster.register.it. 2026062401 10800 3600 604800 86400",
+        "cname_targets": [
+            "caspieonline.eu.",
+            "caspieonline.eu."
+        ],
+        "takeover_risks": []
+    },
+    "attack_surface": [
+        {
+            "subdomain": "adesioniatac.caspieonline.eu",
+            "ip": "2.228.12.55",
+            "security": {
+                "ports": [],
+                "cves": [],
+                "tags": [],
+                "hostnames": []
+            },
+            "web": {
+                "url": "http://adesioniatac.caspieonline.eu",
+                "status": 0,
+                "title": "Unreachable"
+            },
+            "tech": {
+                "technologies": [],
+                "security_headers": {}
+            }
+        },
+        {
+            "subdomain": "adesioniesercito.caspieonline.eu",
+            "ip": "2.228.12.54",
+            "security": {
+                "ports": [],
+                "cves": [],
+                "tags": [],
+                "hostnames": []
+            },
+            "web": {
+                "url": "http://adesioniesercito.caspieonline.eu",
+                "status": 0,
+                "title": "Unreachable"
+            },
+            "tech": {
+                "technologies": [],
+                "security_headers": {}
+            }
+        },
+        {
+            "subdomain": "adesioniministero.caspieonline.eu",
+            "ip": "2.228.12.49",
+            "security": {
+                "ports": [],
+                "cves": [],
+                "tags": [
+                    "vpn"
+                ],
+                "hostnames": [
+                    "2-228-12-49.ip189.fastwebnet.it"
+                ]
+            },
+            "web": {
+                "url": "http://adesioniministero.caspieonline.eu",
+                "status": 0,
+                "title": "Unreachable"
+            },
+            "tech": {
+                "technologies": [],
+                "security_headers": {}
+            }
+        },
+        {
+            "subdomain": "alcatel.caspieonline.eu",
+            "ip": "2.228.12.56",
+            "security": {
+                "ports": [
+                    4444
+                ],
+                "cves": [],
+                "tags": [],
+                "hostnames": [
+                    "2-228-12-56.ip189.fastwebnet.it"
+                ]
+            },
+            "web": {
+                "url": "https://alcatel.caspieonline.eu/",
+                "status": 200,
+                "title": "User Portal"
+            },
+            "tech": {
+                "technologies": [
+                    "Apache"
+                ],
+                "security_headers": {
+                    "Strict-Transport-Security": true,
+                    "Content-Security-Policy": true,
+                    "X-Frame-Options": true,
+                    "X-Content-Type-Options": true,
+                    "Referrer-Policy": false,
+                    "Permissions-Policy": false
+                },
+                "missing_security_headers": [
+                    "Referrer-Policy",
+                    "Permissions-Policy"
+                ]
+            }
+        },
+        {
+            "subdomain": "caspieonline.eu",
+            "ip": "2.228.12.43",
+            "security": {
+                "ports": [
+                    80,
+                    443
+                ],
+                "cves": [],
+                "tags": [
+                    "vpn"
+                ],
+                "hostnames": [
+                    "www.caspieonline.eu",
+                    "caspieonline.eu",
+                    "2-228-12-43.ip189.fastwebnet.it"
+                ]
+            },
+            "web": {
+                "url": "https://caspieonline.eu/default.aspx?r=1",
+                "status": 200,
+                "title": "Sistema Informativo Integrato Caspie.Net"
+            },
+            "tech": {
+                "technologies": [
+                    "IIS",
+                    "ASP.NET"
+                ],
+                "security_headers": {
+                    "Strict-Transport-Security": true,
+                    "Content-Security-Policy": true,
+                    "X-Frame-Options": false,
+                    "X-Content-Type-Options": true,
+                    "Referrer-Policy": false,
+                    "Permissions-Policy": false
+                },
+                "missing_security_headers": [
+                    "X-Frame-Options",
+                    "Referrer-Policy",
+                    "Permissions-Policy"
+                ]
+            }
+        },
+        {
+            "subdomain": "check-up.caspieonline.eu",
+            "ip": "2.228.12.50",
+            "security": {
+                "ports": [],
+                "cves": [],
+                "tags": [],
+                "hostnames": []
+            },
+            "web": {
+                "url": "http://check-up.caspieonline.eu",
+                "status": 0,
+                "title": "Unreachable"
+            },
+            "tech": {
+                "technologies": [],
+                "security_headers": {}
+            }
+        },
+        {
+            "subdomain": "m.caspieonline.eu",
+            "ip": "2.228.12.52",
+            "security": {
+                "ports": [],
+                "cves": [],
+                "tags": [
+                    "vpn"
+                ],
+                "hostnames": [
+                    "2-228-12-52.ip189.fastwebnet.it"
+                ]
+            },
+            "web": {
+                "url": "https://m.caspieonline.eu/?AspxAutoDetectCookieSupport=1",
+                "status": 200,
+                "title": "Caspie"
+            },
+            "tech": {
+                "technologies": [
+                    "IIS",
+                    "ASP.NET"
+                ],
+                "security_headers": {
+                    "Strict-Transport-Security": true,
+                    "Content-Security-Policy": true,
+                    "X-Frame-Options": true,
+                    "X-Content-Type-Options": true,
+                    "Referrer-Policy": false,
+                    "Permissions-Policy": false
+                },
+                "missing_security_headers": [
+                    "Referrer-Policy",
+                    "Permissions-Policy"
+                ]
+            }
+        },
+        {
+            "subdomain": "mail.caspieonline.eu",
+            "ip": "2.228.12.35",
+            "security": {
+                "ports": [],
+                "cves": [],
+                "tags": [
+                    "vpn"
+                ],
+                "hostnames": [
+                    "mail.caspieonline.eu"
+                ]
+            },
+            "web": {
+                "url": "http://mail.caspieonline.eu",
+                "status": 0,
+                "title": "Unreachable"
+            },
+            "tech": {
+                "technologies": [],
+                "security_headers": {}
+            }
+        },
+        {
+            "subdomain": "pensionatimarina.caspieonline.eu",
+            "ip": "2.228.12.51",
+            "security": {
+                "ports": [],
+                "cves": [],
+                "tags": [],
+                "hostnames": []
+            },
+            "web": {
+                "url": "http://pensionatimarina.caspieonline.eu",
+                "status": 0,
+                "title": "Unreachable"
+            },
+            "tech": {
+                "technologies": [],
+                "security_headers": {}
+            }
+        },
+        {
+            "subdomain": "wscd.caspieonline.eu",
+            "ip": "2.228.12.34",
+            "security": {
+                "ports": [],
+                "cves": [],
+                "tags": [
+                    "vpn"
+                ],
+                "hostnames": [
+                    "2-228-12-34.ip189.fastwebnet.it"
+                ]
+            },
+            "web": {
+                "url": "http://wscd.caspieonline.eu",
+                "status": 0,
+                "title": "Unreachable"
+            },
+            "tech": {
+                "technologies": [],
+                "security_headers": {}
+            }
+        },
+        {
+            "subdomain": "www.caspieonline.eu",
+            "ip": "2.228.12.43",
+            "security": {
+                "ports": [
+                    80,
+                    443
+                ],
+                "cves": [],
+                "tags": [
+                    "vpn"
+                ],
+                "hostnames": [
+                    "www.caspieonline.eu",
+                    "caspieonline.eu",
+                    "2-228-12-43.ip189.fastwebnet.it"
+                ]
+            },
+            "web": {
+                "url": "https://www.caspieonline.eu/default.aspx?r=1",
+                "status": 200,
+                "title": "Sistema Informativo Integrato Caspie.Net"
+            },
+            "tech": {
+                "technologies": [
+                    "IIS",
+                    "ASP.NET"
+                ],
+                "security_headers": {
+                    "Strict-Transport-Security": true,
+                    "Content-Security-Policy": true,
+                    "X-Frame-Options": false,
+                    "X-Content-Type-Options": true,
+                    "Referrer-Policy": false,
+                    "Permissions-Policy": false
+                },
+                "missing_security_headers": [
+                    "X-Frame-Options",
+                    "Referrer-Policy",
+                    "Permissions-Policy"
+                ]
+            }
+        }
+    ],
+    "deep_osint": {
+        "favicon": {
+            "found": true,
+            "source": "fallback_root",
+            "url": "https://caspieonline.eu/favicon.ico",
+            "hash": -405706251,
+            "tech": "Unknown",
+            "related_hosts": []
+        },
+        "js_secrets": {
+            "secrets": {
+                "Token in code": [
+                    " + window.encodeURIComponent(connection.token);\r\n            }\r\n\r\n            if (connection.data) {\r\n                preparedUrl += ",
+                    " + window.encodeURIComponent(connection.groupsToken);\r\n            }\r\n\r\n            if (!reconnecting) {\r\n                url += "
+                ]
+            },
+            "endpoints": [],
+            "emails": [],
+            "js_files_scanned": 9,
+            "found": true
+        },
+        "urldna": {
+            "scan_id": "6a6885343b77500008a9b753",
+            "url": "https://caspieonline.eu",
+            "verdict": "SAFE",
+            "technologies": [
+                "jQuery v1.6.4",
+                "IIS v10.0",
+                "Windows Server (Operating systems)",
+                "Microsoft ASP.NET v4.0.30319"
+            ],
+            "cookies": [
+                "ASP.NET_SessionId=tiwg0rx13tagmb5ihgx4... [dom: caspieonline.eu]"
+            ],
+            "http_transactions": [
+                "https://caspieonline.eu/signalr/start?transport=serverSentEvents&clientProtocol=1.5&connectionToken=Sd7uPMMdP%2F8oCHvwrdR66Pa2k4nLM9CM8nvAUnz%2FP73Gn4MzFSTb0mFlozdbdijdUo17Dcisr%2BXuJJozjIZaq%2BMCXSgRLsoaLqjmsD1MdcFkDLiJE5AmOeQeB2DnsNDb&connectionData=%5B%7B%22name%22%3A%22messagehub%22%7D%5D&_=1785234745185",
+                "https://caspieonline.eu/favicon.ico",
+                "https://caspieonline.eu/signalr/connect?transport=serverSentEvents&clientProtocol=1.5&connectionToken=Sd7uPMMdP%2F8oCHvwrdR66Pa2k4nLM9CM8nvAUnz%2FP73Gn4MzFSTb0mFlozdbdijdUo17Dcisr%2BXuJJozjIZaq%2BMCXSgRLsoaLqjmsD1MdcFkDLiJE5AmOeQeB2DnsNDb&connectionData=%5B%7B%22name%22%3A%22messagehub%22%7D%5D&tid=1",
+                "https://caspieonline.eu/animated_favicon1.gif",
+                "https://caspieonline.eu/signalr/negotiate?clientProtocol=1.5&connectionData=%5B%7B%22name%22%3A%22messagehub%22%7D%5D&_=1785234744893",
+                "https://caspieonline.eu/App_Themes/Caspie2/img/ombra-marquee-default.png",
+                "https://caspieonline.eu/App_Themes/Caspie2/img/btn-accedi.png",
+                "https://caspieonline.eu/App_Themes/Caspie2/img/bg-campologin.png",
+                "https://caspieonline.eu/App_Themes/Caspie2/img/bg-bo4.jpg",
+                "https://caspieonline.eu/App_Themes/Caspie2/img/logo-bo-interna.png",
+                "https://caspieonline.eu/App_Themes/Caspie2/img/ico-messaggi.png",
+                "https://caspieonline.eu/WebResource.axd?d=JoBkLzP19aTuxbWOhHobYixsoZ2uwpYkuCw7Sv2TVsiKgjP2PYPsP_rStbnCmjW66U22o0Tsw8o432NQT01FrQ2&t=638901845280000000",
+                "https://caspieonline.eu/WebResource.axd?d=x2nkrMJGXkMELz33nwnakPk2-tgHgdaIb-B9gUyz5r6_S9S-7LZaYMc1hxCbi9UL9ll663hOrKBj8nstpTcIjC2IaCaosQRdyIF2PIjR1Qc1&t=638901845280000000",
+                "https://caspieonline.eu/Scripts/jquery-1.6.4.min.js",
+                "https://caspieonline.eu/Scripts/ymz_box.min.js",
+                "https://caspieonline.eu/Scripts/jquery.signalR-2.2.2.js",
+                "https://caspieonline.eu/WebResource.axd?d=pynGkmcFUV13He1Qd6_TZNhS6VRGNF6NlJKhg56piClQFbpDKcLdmfnzXcPsU0FtaS0CA0nOHH0LdSXZmdT3aQ2&t=638901845280000000",
+                "https://caspieonline.eu/signalr/hubs",
+                "https://caspieonline.eu/Script/JScript.js",
+                "https://caspieonline.eu/App_Themes/Caspie2/Office2003_C2.css"
+            ],
+            "console_messages": [
+                "[verbose] [DOM] Input elements should have autocomplete attributes (suggested: \"current-password\"): (More info: https://goo.gl/9p2vKq) %o",
+                "[error] The value for the Content-Security-Policy directive 'default-src' contains one or more invalid characters. In a source expression, non-whitespace characters outside ASCII 0x21-0x7E must be Punycode-encoded, as described in RFC 3492 (https://tools.ietf.org/html/rfc3492), if part of the hostname and percent-encoded, as described in RFC 3986, section 2.1 (http://tools.ietf.org/html/rfc3986#section-2.1), if part of the path."
+            ],
+            "registrar": "Register S.p.A."
+        }
+    },
+    "people": {
+        "total_found": 0,
+        "naming_convention": "Unknown",
+        "people": [],
+        "generic": [],
+        "sources_used": {
+            "bing": true,
+            "duckduckgo": true,
+            "github": true,
+            "phonebook": true,
+            "hunter_io": false
+        }
+    },
+    "buckets": {
+        "found": [],
+        "total": 0,
+        "open": [],
+        "open_count": 0
+    },
+    "external_tools": {
+        "photon": {
+            "installed": true,
+            "command_run": "python3 /mnt/c/Users/l.latini/Documents/Photon/photon.py -u https://caspieonline.eu -l 2 -t 5 --keys -o /tmp/tddt_photon_3hx9xldz/out",
+            "urls": [],
+            "keys": [],
+            "files": [],
+            "intel": [],
+            "external": [
+                "https://m.caspieonline.eu"
+            ]
+        }
+    }
+}

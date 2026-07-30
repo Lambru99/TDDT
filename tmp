@@ -1,0 +1,98 @@
+└─$ ./ike.sh 2.228.12.43
+============================================
+  IKE Transform Enumerator
+  Target : 2.228.12.43
+  Output : ike_enum_results_20260723_102915.txt
+  Delay  : 2s tra ogni probe
+============================================
+
+
+[FASE 1] IKEv2 - Default proposals
+  [*] IKEv2 default ... ✗ NOTIFY: 2.228.12.43   Notify message 14 (NO_PROPOSAL_CHOSEN)
+  [*] IKEv2 AES-256/12/G14/Auth=2 ... ✗ NOTIFY: 2.228.12.43     Notify message 14 (NO_PROPOSAL_CHOSEN)
+  [*] IKEv2 AES-256/12/G14/Auth=0 ... ✗ NOTIFY: 2.228.12.43     Notify message 14 (NO_PROPOSAL_CHOSEN)
+  [*] IKEv2 AES-256/13/G14/Auth=2 ... ✗ NOTIFY: 2.228.12.43     Notify message 14 (NO_PROPOSAL_CHOSEN)
+  [*] IKEv2 AES-256/13/G14/Auth=0 ... ✗ NOTIFY: 2.228.12.43     Notify message 14 (NO_PROPOSAL_CHOSEN)
+  [*] IKEv2 AES-256/14/G14/Auth=2 ... ✗ NOTIFY: 2.228.12.43     Notify message 14 (NO_PROPOSAL_CHOSEN)
+  [*] IKEv2 AES-256/14/G14/Auth=0 ... ✗ NOTIFY: 2.228.12.43     Notify message 14 (NO_PROPOSAL_CHOSEN)
+  [*] IKEv2 AES-256/2/G14/Auth=2 ... ✗ NOTIFY: 2.228.12.43      Notify message 14 (NO_PROPOSAL_CHOSEN)
+  [*] IKEv2 AES-256/2/G14/Auth=0 ... ✗ NOTIFY: 2.228.12.43      Notify message 14 (NO_PROPOSAL_CHOSEN)
+  [*] IKEv2 AES-256/12/G19/Auth=2 ... ✗ NOTIFY: 2.228.12.43     Notify message 14 (NO_PROPOSAL_CHOSEN)
+...
+
+[FASE 2] IKEv1 Main Mode - AES (con keylen)
+  [*] IKEv1-MM AES-128/H1/G1/A1 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM AES-128/H1/G1/A3 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM AES-128/H1/G1/A64221 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM AES-128/H1/G2/A1 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM AES-128/H1/G2/A3 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM AES-128/H1/G2/A64221 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM AES-128/H1/G5/A1 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM AES-128/H1/G5/A3 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM AES-128/H1/G5/A64221 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM AES-128/H1/G14/A1 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM AES-128/H1/G14/A3 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM AES-128/H1/G14/A64221 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM AES-128/H1/G15/A1 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM AES-128/H1/G15/A3 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM AES-128/H1/G15/A64221 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM AES-128/H1/G16/A1 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM AES-128/H1/G16/A3 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM AES-128/H1/G16/A64221 ... ✗ NO-PROPOSAL
+...
+
+[FASE 3] IKEv1 Main Mode - DES/3DES (legacy)
+  [*] IKEv1-MM Enc1/H1/G1/A1 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM Enc1/H1/G1/A3 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM Enc1/H1/G1/A64221 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM Enc1/H1/G2/A1 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM Enc1/H1/G2/A3 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM Enc1/H1/G2/A64221 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM Enc1/H1/G5/A1 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM Enc1/H1/G5/A3 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM Enc1/H1/G5/A64221 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM Enc1/H1/G14/A1 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM Enc1/H1/G14/A3 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM Enc1/H1/G14/A64221 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM Enc1/H1/G15/A1 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM Enc1/H1/G15/A3 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM Enc1/H1/G15/A64221 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM Enc1/H1/G16/A1 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM Enc1/H1/G16/A3 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM Enc1/H1/G16/A64221 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM Enc1/H2/G1/A1 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM Enc1/H2/G1/A3 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM Enc1/H2/G1/A64221 ... ✗ NO-PROPOSAL
+  [*] IKEv1-MM Enc1/H2/G2/A1 ... ✗ NO-PROPOSAL
+...
+
+[FASE 4] IKEv1 Aggressive Mode
+  [*] IKEv1-AGG id=vpn Enc5/H1/G2/PSK ... ✗ NO-PROPOSAL
+  [*] IKEv1-AGG id=vpn Enc5/H1/G5/PSK ... ✗ NO-PROPOSAL
+  [*] IKEv1-AGG id=vpn Enc5/H1/G14/PSK ... ✗ NO-PROPOSAL
+  [*] IKEv1-AGG id=vpn Enc5/H2/G2/PSK ... ✗ NO-PROPOSAL
+  [*] IKEv1-AGG id=vpn Enc5/H2/G5/PSK ... ✗ NO-PROPOSAL
+  [*] IKEv1-AGG id=vpn Enc5/H2/G14/PSK ... ✗ NO-PROPOSAL
+  [*] IKEv1-AGG id=vpn Enc5/H4/G2/PSK ... ✗ NO-PROPOSAL
+  [*] IKEv1-AGG id=vpn Enc5/H4/G5/PSK ... ✗ NO-PROPOSAL
+  [*] IKEv1-AGG id=vpn Enc5/H4/G14/PSK ... ✗ NO-PROPOSAL
+  [*] IKEv1-AGG id=vpn Enc7/H1/G2/PSK ... ✗ NO-PROPOSAL
+  [*] IKEv1-AGG id=vpn Enc7/H1/G5/PSK ... ✗ NO-PROPOSAL
+  [*] IKEv1-AGG id=vpn Enc7/H1/G14/PSK ... ✗ NO-PROPOSAL
+  [*] IKEv1-AGG id=vpn Enc7/H2/G2/PSK ... ✗ NO-PROPOSAL
+  [*] IKEv1-AGG id=vpn Enc7/H2/G5/PSK ... ✗ NO-PROPOSAL
+  [*] IKEv1-AGG id=vpn Enc7/H2/G14/PSK ... ✗ NO-PROPOSAL
+  [*] IKEv1-AGG id=vpn Enc7/H4/G2/PSK ... ✗ NO-PROPOSAL
+  [*] IKEv1-AGG id=vpn Enc7/H4/G5/PSK ... ✗ NO-PROPOSAL
+  [*] IKEv1-AGG id=vpn Enc7/H4/G14/PSK ... ✗ NO-PROPOSAL
+  [*] IKEv1-AGG id=cisco Enc5/H1/G2/PSK ... ✗ NO-PROPOSAL
+  [*] IKEv1-AGG id=cisco Enc5/H1/G5/PSK ... ✗ NO-PROPOSAL
+...
+
+============================================
+  Nessun handshake ottenuto.
+  Possibili cause:
+   - Il server usa IKEv2 con suite non standard
+   - Protezione attiva contro probe (policy drop)
+   - VPN non configurata per accettare connessioni esterne
+============================================

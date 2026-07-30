@@ -3,3 +3,5 @@ dnspython
 rich
 bs4
 mmh3
+python-dotenv
+urldna
