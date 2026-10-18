@@ -15,6 +15,23 @@ from tddt.core.module import BaseModule, register_module
 _log = get_logger(__name__)
 
 
+def _resolve_service_url(entity: Service) -> str | None:
+    """Return the http(s) URL to probe for *entity*, or None.
+
+    Service producers follow two conventions: some set `value` to the URL
+    directly, others set `value` to an identifier like "GitHub:alice" and put
+    the URL under `metadata["url"]`. Callers that need to fetch the service
+    page must prefer metadata["url"] when present and fall back to value only
+    if it is already an http(s) URL.
+    """
+    meta_url = entity.metadata.get("url")
+    if isinstance(meta_url, str) and meta_url.startswith(("http://", "https://")):
+        return meta_url
+    if entity.value.startswith(("http://", "https://")):
+        return entity.value
+    return None
+
+
 @register_module(
     name="user.service.avatar_hasher",
     mode=["user"],
@@ -31,8 +48,13 @@ class ServiceAvatarHasherModule(BaseModule):
             if not isinstance(entity, Service):
                 continue
 
+            probe_url = _resolve_service_url(entity)
+            if probe_url is None:
+                _log.debug("Service %s has no http(s) URL to probe; skipping", entity.value)
+                continue
+
             try:
-                resp = self.client.get(entity.value, timeout=15)
+                resp = self.client.get(probe_url, timeout=15)
             except Exception as e:
                 _log.warning("HTTP error fetching service %s: %s", entity.value, e)
                 continue
@@ -58,7 +80,7 @@ class ServiceAvatarHasherModule(BaseModule):
                     avatar_urls.append(src.strip())
 
             for raw_avatar_url in avatar_urls:
-                avatar_url = urljoin(entity.value, raw_avatar_url)
+                avatar_url = urljoin(probe_url, raw_avatar_url)
                 if not avatar_url.startswith(("http://", "https://")):
                     continue
 

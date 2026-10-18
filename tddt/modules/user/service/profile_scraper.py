@@ -11,6 +11,7 @@ from bs4 import BeautifulSoup
 from tddt.core.entity import BaseEntity, Email, FullName, Service, Website
 from tddt.core.logger import get_logger
 from tddt.core.module import BaseModule, register_module
+from tddt.modules.user.service.avatar_hasher import _resolve_service_url
 
 _log = get_logger(__name__)
 
@@ -42,8 +43,13 @@ class ServiceProfileScraperModule(BaseModule):
             if not isinstance(entity, Service):
                 continue
 
+            probe_url = _resolve_service_url(entity)
+            if probe_url is None:
+                _log.debug("Service %s has no http(s) URL to probe; skipping", entity.value)
+                continue
+
             try:
-                resp = self.client.get(entity.value, timeout=15)
+                resp = self.client.get(probe_url, timeout=15)
             except Exception as e:
                 _log.warning("HTTP error scraping profile %s: %s", entity.value, e)
                 continue
