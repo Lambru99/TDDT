@@ -1,172 +1,166 @@
-# TDDT
-A modular, Python-based External Attack Surface Management (EASM) tool designed for corporate reconnaissance and OSINT.
+# TDDT (Total Domain Discovery Tool) v2
 
-This tool automates the gathering of intelligence on target domains, combining Passive OSINT (safe, legal, no-touch) with Active Reconnaissance capabilities. It features a beautiful terminal interface powered by the rich library.
+A high-performance, modular External Attack Surface Management (EASM) and User OSINT framework in Python.
+
+TDDT correlates intelligence through an automated entity graph, dispatching passive and active reconnaissance modules based on declared entity consumption and production rules.
+
+---
 
 ## ⚠️ Legal Disclaimer
 
-Usage of this tool for attacking targets without prior mutual consent is illegal.
-It is the end user's responsibility to obey all applicable local, state, and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program.
+Usage of this tool for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state, and international laws. Developers assume no liability for misuse.
 
-* Use the `−l` (`−−light`) flag for purely passive OSINT research (safe mode).
+- Use `--light` (`-l`) for strictly passive OSINT research (zero active network probes against target systems).
+- Active modules (e.g. SMTP mailbox validation, socket port scanning, CORS verification) must only be used on assets you own or have explicit permission to test.
 
-* Active Mode (default) interacts with the target infrastructure (Port Scanning, etc.) and should only be used on assets you own or have explicit permission to test.
-
-## ✨ Features
-
-* 🕵️ Identity Recon: WHOIS data retrieval (Registrar, Admin, Tech contacts).
-
-* 🌐 Subdomain Enumeration: Aggregates data from crt.sh and HackerTarget. Includes fallback logic if APIs are down.
-
-* 📡 Port Scanning:
-
-    *   Active: TCP Connect scan (requires authorization).
-
-    * Passive: Historical port data via InternetDB/Shodan (safe).
-
-* 📧 Email Harvesting: Scrapes Search Engines (Bing, DuckDuckGo) to find employee emails and infer naming conventions (e.g., name.surname@company.com).
-
-* 🧠 Deep OSINT:
-
-    * Favicon Hash: Fingerprints the website icon to find hidden assets on Shodan.
-
-    * ID Analytics: Reverse search on Google Analytics/AdSense IDs to find correlated domains.
-
-    * Wayback Machine: Time travels to find deleted secrets (.env, .sql, .bak files).
-
-* 💾 JSON Export: Saves full reports for further analysis.
+---
 
 ## 📦 Installation
 
-This project is built with Python 3. It is recommended to use a Virtual Environment to manage dependencies.
-1. Clone the Repository
+TDDT v2 requires Python 3.11+.
 
+### Recommended: Install via pipx
+```bash
+pipx install .
+```
+
+### Or Install via venv
 ```bash
 git clone https://github.com/Lambru99/TDDT.git
 cd TDDT
-```
-2. Create a Virtual Environment
-
-Linux / macOS:
-```bash
 python3 -m venv venv
 source venv/bin/activate
+pip install -e .
 ```
 
-Windows:
-```bash
-python -m venv venv
-.\venv\Scripts\activate
-```
-3. Install Dependencies
+---
 
-```bash
-pip install -r requirements.txt
-```
+## 🚀 Quick Start & CLI Subcommands
 
-## 🚀 Usage
+TDDT v2 provides dedicated subcommands for corporate surface mapping and user identity profiling.
 
-Run the tool by supplying the target domain.
-Basic Command (Full/Active Mode)
+### 1. Corporate Mode (`tddt corp`)
+Discovers subdomains, DNS infrastructure, cloud buckets, exposed secrets, web technologies, and security findings.
 
 ```bash
-python main.py example.com
-```
-Passive Mode (Safe / Light)
+# Passive-only corporate scan (safe, no direct active probes)
+tddt corp example.com --light
 
-Recommended for initial OSINT without touching the target's ports.
+# Full scan with active port scanning and takeover verification
+tddt corp example.com -o report-example.json
+
+# Skip modules that require external API keys
+tddt corp example.com --only-keyless
+```
+
+### 2. User Mode (`tddt user`)
+Cross-references identities across emails, usernames, names, and phone numbers:
+
 ```bash
-python main.py example.com --light
+# Profile an individual by email
+tddt user --email victim@target.org --light
+
+# Profile by full name and dork for CVs/documents and personal domains
+tddt user --name "John Doe"
+
+# Username enumeration across hundreds of sites via WhatsMyName
+tddt user --username johndoe
+
+# Phone number validation and enrichment
+tddt user --phone "+14155552671"
+
+# Opt-in cross-mode pivot: if personal websites or domains are found, automatically run corporate reconnaissance
+tddt user --name "Jane Doe" --follow-domains
 ```
-Command Line Arguments
 
-| Flag            | Description                                                                         |
-|-----------------|-------------------------------------------------------------------------------------|
-| domain          | The target domain (e.g., example.com).                                              |
-| −h, −−help      | Show the advanced help menu.                                                        |
-| −l, −−light     | PASSIVE MODE. Disables active port scanning. Includes Whois, Email, and Deep OSINT. |
-| −d, −−deep      | Run Deep OSINT modules (Favicon hashing, ID Analytics, Wayback History).            |
-| −e, −−email     | Run People/Email harvesting only.                                                   |
-| −w, −−whois     | Run only WHOIS identity check.                                                      |
-| −r, −−recon     | Run only Infrastructure Recon (Subdomains + Ports).                                 |
-| "−o output.json | Save the final report to a JSON file.                                               |
+### 3. Utility Subcommands
+```bash
+# Update WhatsMyName detection rules database
+tddt update-wmn-db
 
-## 🧩 How to Add New Modules
+# List all registered corporate and user modules
+tddt list-modules
 
-This tool is designed to be modular. All logic resides in the modules/ folder, orchestrated by main.py.
-Step 1: Create the Module
+# Clear cached HTTP responses
+tddt clear-cache
+```
 
-Create a new Python file in the modules/ directory (e.g., modules/myn​ews​canner.py).
-Define a class that performs a specific task.
+---
+
+## 🛠️ CLI Flags Reference
+
+| Flag | Description |
+|------|-------------|
+| `-o, --output FILE` | Path to save JSON report (default: `report-<target>-<timestamp>.json`) |
+| `-l, --light` | Passive-only mode. Disables active TCP sockets, SMTP brute force, and active probes. |
+| `--only-keyless` | Skips any module requiring paid/registered API keys. |
+| `-t, --threads N` | Thread pool concurrency (default: 20). |
+| `-v, -vv, -vvv` | Verbosity levels (INFO, DEBUG, TRACE). |
+| `--proxy URL` | HTTP/SOCKS5 proxy URL (e.g. `http://127.0.0.1:8080` or `socks5://127.0.0.1:9050`). |
+| `--insecure` | Disable TLS certificate verification. |
+| `--no-cache` | Disable SQLite HTTP response caching. |
+| `--max-iterations N`| Maximum correlation loop iterations (default: 5). |
+| `--max-runtime S` | Maximum total scan runtime in seconds (default: 600.0). |
+| `--follow-domains` | *(User mode only)* Opt-in to trigger corporate scan on discovered domains. |
+
+---
+
+## 🔑 API Keys Configuration
+
+Copy `.env.example` to `.env` to configure optional API keys:
+
+```bash
+cp .env.example .env
+```
+
+Supported environment variables:
+- `GITHUB_TOKEN`: GitHub API token for commit scraping and secret mining
+- `HIBP_API_KEY`: Have I Been Pwned breach checks
+- `DEHASHED_API_KEY`: DeHashed breach search
+- `TRUECALLER_API_KEY`: Truecaller phone owner lookup
+- `HUNTER_API_KEY`: Hunter.io email harvesting
+- `OTX_API_KEY`: AlienVault OTX passive DNS
+- `URLSCAN_API_KEY`: URLScan.io submissions
+- `URLDNA_API_KEY`: urlDNA intelligence
+- `GRAYHAT_API_KEY`: GrayhatWarfare cloud bucket search
+
+---
+
+## 🧩 Adding New Modules
+
+TDDT v2 features an autodiscovery module registry. Creating a new module is simple:
 
 ```python
-modules/my_new_scanner.py
+from collections.abc import Iterable
+from tddt.core.entity import BaseEntity, Domain, Subdomain
+from tddt.core.module import BaseModule, register_module
 
-import requests
-
-class MyNewScanner:
-def init(self, domain):
-self.domain = domain
-
-def run(self):
-    # Your logic here
-    return {"result": f"Scanned {self.domain}"}
-
-```
-Step 2: Import in Main
-
-Open main.py and import your new class at the top.
-
-```python
-main.py
-
-from modules.my_new_scanner import MyNewScanner
-```
-Step 3: Integrate Logic
-
-Scroll down to the execution flow in main.py (e.g., create a new Phase or add to an existing one) and initialize your class.
-
-```python
-# Inside main() function...
-
-# PHASE X: CUSTOM SCAN
-print("Running custom scan...")
-my_scanner = MyNewScanner(args.domain)
-result = my_scanner.run()
-
-# Add to report
-full_report['custom_scan'] = result
-
-# Print to console (using rich)
-console.print(result)
-
+@register_module(
+    name="corporate.subdomain.custom_source",
+    mode=["corporate"],
+    consumes=[Domain],
+    produces=[Subdomain],
+    active=False,
+    requires_key=None,
+)
+class CustomSubdomainModule(BaseModule):
+    def run(self, entities: Iterable[BaseEntity]) -> Iterable[BaseEntity]:
+        for entity in entities:
+            if not isinstance(entity, Domain):
+                continue
+            # Your OSINT logic here
+            yield Subdomain(
+                value=f"admin.{entity.value}",
+                parent_id=entity.id,
+                source_module=self.name,
+                confidence=0.8,
+            )
 ```
 
-## 🛠️ Technology Stack & Libraries
+Save your file under `tddt/modules/corporate/` or `tddt/modules/user/` and TDDT discovers and runs it automatically.
 
-This project is Open Source (FOSS) and leverages the following powerful Python libraries:
+---
 
-*    Rich: For the beautiful terminal UI, tables, and progress bars.
+## 🔄 Migration from v1
 
-*    Requests: For handling HTTP requests to APIs and Targets.
-
-*    BeautifulSoup4: For HTML parsing (Email scraping, Title extraction).
-
-*    DNSPython: For DNS resolution and verification.
-
-*    mmh3: For MurmurHash3 calculation (Favicon fingerprinting).
-
-## 📄 License
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-
-Happy Hacking! 🕵️‍♂️
-
+TDDT v2 is an architectural rewrite introducing a typed Entity Graph (`EntityGraph`), correlation engine, structured reporting, and dedicated subcommands (`corp` and `user`). Legacy calls using `python main.py <domain> [flags]` remain supported via a backwards-compatibility shim that prints a deprecation warning and automatically translates legacy flags into `tddt corp <domain>`. All custom scripts should migrate to the `tddt` CLI.
