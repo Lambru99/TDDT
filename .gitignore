@@ -210,5 +210,13 @@ __marimo__/
 .cache/
 .superpowers/
 report-*.json
+report-*.md
+report-*.html
+report-*.log
 tests/cassettes/
+
+# Local AI-tool caches / per-user settings — tool-local, never shared
+.agents/
+.claude/
+skills-lock.json
 
