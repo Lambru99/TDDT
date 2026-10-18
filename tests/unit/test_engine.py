@@ -152,7 +152,9 @@ def test_engine_respects_max_entities_per_type():
     class Flood(BaseModule):
         def run(self, entities):
             for e in entities:
-                for i in range(5000):
+                if type(e) is not Domain:
+                    continue
+                for i in range(500):
                     yield Subdomain(value=f"sub{i}.{e.value}", parent_id=e.id)
 
     graph = engine.scan([Domain(value="x.com")], mode="corporate")

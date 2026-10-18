@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from tddt.cli import main
-from tddt.core.http import reset_client
+from tddt.core.http import HttpClient, reset_client
 
 
 @pytest.fixture(autouse=True)
@@ -18,13 +18,21 @@ def _cleanup():
 def test_user_scan_email_e2e(tmp_path):
     report_file = tmp_path / "user_report.json"
 
-    # Mock DNS resolution
     mock_dns_answer = MagicMock()
     mock_mx_item = MagicMock()
     mock_mx_item.exchange.to_text.return_value = "mail.example.com."
     mock_dns_answer.__iter__.return_value = [mock_mx_item]
 
-    with patch("dns.resolver.resolve", return_value=mock_dns_answer):
+    mock_resp = MagicMock()
+    mock_resp.status_code = 200
+    mock_resp.text = "<html></html>"
+    mock_resp.content = b"<html></html>"
+    mock_resp.json.return_value = []
+    mock_resp.headers = {"Content-Type": "text/html"}
+
+    with patch("dns.resolver.resolve", return_value=mock_dns_answer), \
+         patch.object(HttpClient, "get", return_value=mock_resp), \
+         patch.object(HttpClient, "post", return_value=mock_resp):
         ret = main([
             "user",
             "--email", "john.doe@example.com",
