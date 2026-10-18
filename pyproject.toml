@@ -81,4 +81,4 @@ testpaths = ["tests"]
 markers = [
     "active: tests that make outbound network connections (skipped in CI)",
 ]
-addopts = "-ra --strict-markers"
+addopts = "-ra --strict-markers --import-mode=importlib"
