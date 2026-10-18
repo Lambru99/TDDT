@@ -216,3 +216,29 @@ def test_clear_cache_removes_file(tmp_path):
 
     assert ret == 0
     assert not cache_file.exists()
+
+
+# ── update-wmn-db ─────────────────────────────────────────────────────────────
+
+
+def test_update_wmn_db_downloads_json(tmp_path):
+    import json
+    import responses
+    from tddt.cli import main
+
+    target_file = tmp_path / "wmn.json"
+    dummy_payload = json.dumps({"sites": [{"name": "Site1"}, {"name": "Site2"}]})
+
+    with responses.RequestsMock() as rsps, \
+         patch("tddt.cli._wmn_db_path", return_value=target_file):
+        rsps.add(
+            responses.GET,
+            "https://raw.githubusercontent.com/WebBreacher/WhatsMyName/main/wmn-data.json",
+            body=dummy_payload,
+            status=200,
+        )
+        ret = main(["update-wmn-db"])
+
+    assert ret == 0
+    assert target_file.is_file()
+    assert "Site1" in target_file.read_text()

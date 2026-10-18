@@ -130,9 +130,24 @@ def _run_user(args: argparse.Namespace, parser: argparse.ArgumentParser | None =
 
 
 def _run_update_wmn_db() -> int:
+    import requests
     log = get_logger(__name__)
-    log.info("update-wmn-db: stub — real download implemented in Task 4.3")
-    return 0
+    target_path = _wmn_db_path()
+    target_path.parent.mkdir(parents=True, exist_ok=True)
+    url = "https://raw.githubusercontent.com/WebBreacher/WhatsMyName/main/wmn-data.json"
+    try:
+        resp = requests.get(url, timeout=30)
+        if resp.status_code == 200:
+            target_path.write_bytes(resp.content)
+            data = resp.json()
+            sites_count = len(data.get("sites", []))
+            log.info("Updated WhatsMyName database: %d sites saved to %s", sites_count, target_path)
+            return 0
+        log.error("Failed to download WhatsMyName DB: HTTP %d", resp.status_code)
+        return 1
+    except Exception as exc:
+        log.error("Error downloading WhatsMyName DB: %s", exc)
+        return 1
 
 
 def _run_clear_cache() -> int:
