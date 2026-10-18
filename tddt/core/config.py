@@ -32,6 +32,8 @@ ENV_KEY_MAP: dict[str, str] = {
     "PHOTON_PATH": "photon_path",
     "HIBP_API_KEY": "hibp",
     "DEHASHED_API_KEY": "dehashed",
+    "TRUECALLER_API_KEY": "truecaller",
+    "TRUECALLER_AUTH": "truecaller",
 }
 
 
@@ -58,6 +60,7 @@ class Settings:
     photon_path: str | None = None
     hibp: str | None = None
     dehashed: str | None = None
+    truecaller: str | None = None
 
 
 def _clean(value: str | None) -> str | None:
