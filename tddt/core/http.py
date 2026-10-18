@@ -131,11 +131,14 @@ class HttpClient:
         host_hint: str | None = None,
         **kw: Any,
     ) -> requests.Response:
-        host = host_hint or urlparse(url).hostname or ""
-        if host and host != "rate_disabled.test":
+        parsed = urlparse(url)
+        host = host_hint or parsed.hostname or ""
+        if host:
             self.rate_limiter.acquire(host)
         kw.setdefault("timeout", self.settings.timeout)
-        _log.debug("%s %s", method, url)
+        # Log without the query string: API keys and tokens often live there.
+        safe_url = f"{parsed.scheme}://{parsed.netloc}{parsed.path}" if parsed.scheme else url
+        _log.debug("%s %s", method, safe_url)
         return self.session.request(method, url, **kw)
 
     def get(self, url: str, host_hint: str | None = None, **kw: Any) -> requests.Response:

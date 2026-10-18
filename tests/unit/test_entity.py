@@ -113,6 +113,23 @@ def test_graph_max_entities_per_type_cap_skips_and_warns(caplog):
     assert any("cap" in rec.message.lower() for rec in caplog.records)
 
 
+def test_graph_cap_warning_logged_once_per_type(caplog):
+    import logging
+
+    g = EntityGraph(max_entities_per_type=2)
+    g.add(Domain(value="d0.com"))
+    g.add(Domain(value="d1.com"))
+    with caplog.at_level(logging.WARNING, logger="tddt.core.entity"):
+        for i in range(50):
+            g.add(Domain(value=f"over-{i}.com"))
+    cap_warnings = [
+        rec for rec in caplog.records if "cap reached" in rec.message.lower()
+    ]
+    assert len(cap_warnings) == 1, (
+        f"expected 1 cap warning for Domain, got {len(cap_warnings)}"
+    )
+
+
 def test_graph_count_of_type():
     g = EntityGraph()
     for i in range(3):

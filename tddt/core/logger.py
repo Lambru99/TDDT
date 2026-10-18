@@ -29,10 +29,10 @@ _FILE_HANDLER_MARK = "_tddt_file_handler"
 _CONSOLE_HANDLER_MARK = "_tddt_console_handler"
 
 
-class _SafeFileFormatter(logging.Formatter):
-    """Formatter for the file handler that escapes non-printable characters
-    so attacker-controlled values cannot inject ANSI sequences, line breaks,
-    or NULs into the on-disk log."""
+class _SafeFormatter(logging.Formatter):
+    """Formatter that escapes non-printable characters so attacker-controlled
+    values cannot inject ANSI sequences, line breaks, or NULs — into the
+    on-disk log (file handler) or into the user's terminal (console handler)."""
 
     def format(self, record: logging.LogRecord) -> str:
         formatted = super().format(record)
@@ -49,6 +49,10 @@ class _SafeFileFormatter(logging.Formatter):
             else:
                 out.append(f"\\x{ord(c):02x}")
         return "".join(out)
+
+
+# Backward-compat alias.
+_SafeFileFormatter = _SafeFormatter
 
 
 def _level_from_verbosity(verbosity: int) -> int:
@@ -90,7 +94,7 @@ def setup_logging(verbosity: int = 0, log_dir: Path | None = None) -> None:
         show_time=True,
         show_path=False,
     )
-    console.setFormatter(logging.Formatter("[%(name)s] %(message)s"))
+    console.setFormatter(_SafeFormatter("[%(name)s] %(message)s"))
     setattr(console, _CONSOLE_HANDLER_MARK, True)
     root.addHandler(console)
 
@@ -104,7 +108,7 @@ def setup_logging(verbosity: int = 0, log_dir: Path | None = None) -> None:
         )
         fh.setLevel(level)
         fh.setFormatter(
-            _SafeFileFormatter("%(asctime)s %(levelname)s [%(name)s] %(message)s")
+            _SafeFormatter("%(asctime)s %(levelname)s [%(name)s] %(message)s")
         )
         setattr(fh, _FILE_HANDLER_MARK, True)
         root.addHandler(fh)

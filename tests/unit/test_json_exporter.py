@@ -106,3 +106,55 @@ def test_output_is_valid_json(tmp_path):
         path,
     )
     assert json.loads(path.read_text()) is not None
+
+
+# ── terminated_reason / iterations / elapsed_s (I1) ─────────────────────────
+
+
+def test_terminated_reason_from_graph_metadata_in_scan_dict(tmp_path):
+    """CorrelationEngine writes terminated_reason/iterations/elapsed_s to
+    graph.metadata. The exporter must surface them in the top-level scan dict."""
+    from tddt.report.json_exporter import export_json
+
+    graph = _graph_with(Domain(value="x.com"))
+    graph.metadata["terminated_reason"] = "max_iterations"
+    graph.metadata["iterations"] = 5
+    graph.metadata["elapsed_s"] = 123.45
+
+    path = tmp_path / "out.json"
+    export_json(graph, {"mode": "corporate"}, path)
+    data = json.loads(path.read_text())
+    assert data["scan"]["terminated_reason"] == "max_iterations"
+    assert data["scan"]["iterations"] == 5
+    assert data["scan"]["elapsed_s"] == 123.45
+
+
+# ── cross_mode_results nested under scan (I2) ───────────────────────────────
+
+
+def test_cross_mode_results_nested_under_scan(tmp_path):
+    """Top-level keys must stay {scan, entities, profile}. cross_mode_results,
+    when passed, belongs under scan — not as a 4th top-level key."""
+    from tddt.report.json_exporter import export_json
+
+    cross = {"corporate": {"example.com": {"by_type": {"Domain": []}}}}
+    path = tmp_path / "out.json"
+    export_json(
+        _graph_with(Domain(value="x.com")),
+        {"mode": "user"},
+        path,
+        cross_mode_results=cross,
+    )
+    data = json.loads(path.read_text())
+    assert set(data.keys()) == {"scan", "entities", "profile"}
+    assert data["scan"]["cross_mode_results"] == cross
+
+
+def test_cross_mode_results_absent_when_none(tmp_path):
+    from tddt.report.json_exporter import export_json
+
+    path = tmp_path / "out.json"
+    export_json(_graph_with(Domain(value="x.com")), {"mode": "user"}, path)
+    data = json.loads(path.read_text())
+    assert "cross_mode_results" not in data
+    assert "cross_mode_results" not in data["scan"]

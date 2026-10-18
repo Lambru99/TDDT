@@ -18,10 +18,22 @@ from tddt.core.entity import Domain, Email, FullName, Phone, Username, Website
 from tddt.core.http import get_client, init_client
 from tddt.core.logger import get_logger, setup_logging
 from tddt.core.module import MODULE_REGISTRY, autodiscover
+from tddt.report.html_exporter import export_html
 from tddt.report.json_exporter import export_json
+from tddt.report.markdown_exporter import export_markdown
+from tddt.report.profile_aggregator import build_profile
 
 if TYPE_CHECKING:
     from tddt.core.entity import EntityGraph
+
+
+FOLLOW_DOMAINS_MAX = 10
+"""Cap on the number of corporate scans fanned out by `--follow-domains`.
+
+Each corporate scan has its own `max_runtime` budget (default 600s). Without a
+cap, a user-scan that surfaces 50 unique Website hosts can push the overall
+runtime to tens of minutes — well past what the user signed up for.
+"""
 
 
 def get_cache_path() -> Path:
@@ -73,6 +85,7 @@ def _run_scan(
     target: str,
 ) -> int:
     setup_logging(args.verbosity)
+    autodiscover()  # Load every registered module before the engine runs.
 
     cli_overrides: dict = {}
     if args.proxy:
@@ -125,8 +138,18 @@ def _run_scan(
                 candidate_domains.add(entity.value.lower())
 
         if candidate_domains:
+            selected = sorted(candidate_domains)[:FOLLOW_DOMAINS_MAX]
+            dropped = len(candidate_domains) - len(selected)
+            if dropped > 0:
+                get_logger(__name__).warning(
+                    "--follow-domains: %d domains over cap (max=%d); scanning "
+                    "the first %d by sort order",
+                    dropped,
+                    FOLLOW_DOMAINS_MAX,
+                    FOLLOW_DOMAINS_MAX,
+                )
             corp_results = {}
-            for dom in sorted(candidate_domains):
+            for dom in selected:
                 corp_graph = engine.scan(
                     seeds=[Domain(value=dom)],
                     mode="corporate",
@@ -136,8 +159,27 @@ def _run_scan(
                 corp_results[dom] = corp_graph.export()
             cross_mode_results["corporate"] = corp_results
 
+    profile = build_profile(graph) if mode == "user" else None
+
     output_path = Path(args.output) if args.output else _default_output_path(target)
-    export_json(graph, scan_meta, output_path, cross_mode_results=cross_mode_results or None)
+    formats = {f.strip().lower() for f in (args.format or "").split(",") if f.strip()}
+    # Default behavior if nothing valid parsed: emit JSON only.
+    emit_json = "json" in formats or not (formats & {"json", "md", "html"})
+    emit_md = "md" in formats or "markdown" in formats
+    emit_html = "html" in formats
+
+    if emit_json:
+        export_json(
+            graph,
+            scan_meta,
+            output_path,
+            profile=profile,
+            cross_mode_results=cross_mode_results or None,
+        )
+    if emit_md:
+        export_markdown(graph, scan_meta, output_path.with_suffix(".md"))
+    if emit_html:
+        export_html(graph, scan_meta, output_path.with_suffix(".html"))
 
     return 0
 
@@ -161,25 +203,48 @@ def _run_user(args: argparse.Namespace, parser: argparse.ArgumentParser | None =
     return _run_scan(seeds, "user", args, target)
 
 
-def _run_update_wmn_db() -> int:
-    import requests
+def _run_update_wmn_db(args: argparse.Namespace | None = None) -> int:
+    """Download the WhatsMyName database via the shared HttpClient so that
+    `--insecure`, `--proxy`, and the UA pool apply (bare `requests.get` bypasses
+    all of them — leaking the user's intent and ignoring their TLS settings)."""
     log = get_logger(__name__)
     target_path = _wmn_db_path()
     target_path.parent.mkdir(parents=True, exist_ok=True)
     url = "https://raw.githubusercontent.com/WebBreacher/WhatsMyName/main/wmn-data.json"
+
+    cli_overrides: dict = {}
+    if args is not None:
+        if getattr(args, "proxy", None):
+            cli_overrides["proxy"] = args.proxy
+        if getattr(args, "insecure", False):
+            cli_overrides["verify_tls"] = False
+    settings = load_settings(cli_overrides=cli_overrides)
     try:
-        resp = requests.get(url, timeout=30)
-        if resp.status_code == 200:
-            target_path.write_bytes(resp.content)
-            data = resp.json()
-            sites_count = len(data.get("sites", []))
-            log.info("Updated WhatsMyName database: %d sites saved to %s", sites_count, target_path)
-            return 0
+        client = get_client()
+    except RuntimeError:
+        cache_path = get_cache_path() if settings.cache_enabled else None
+        client = init_client(settings, cache_path=cache_path)
+
+    try:
+        resp = client.get(url, timeout=30)
+    except Exception as exc:  # noqa: BLE001 - network error isolation
+        log.error("Error downloading WhatsMyName DB: %s", exc, exc_info=True)
+        return 1
+
+    if resp.status_code != 200:
         log.error("Failed to download WhatsMyName DB: HTTP %d", resp.status_code)
         return 1
-    except Exception as exc:
-        log.error("Error downloading WhatsMyName DB: %s", exc)
-        return 1
+
+    target_path.write_bytes(resp.content)
+    try:
+        data = resp.json()
+        sites_count = len(data.get("sites", []))
+    except ValueError:
+        sites_count = 0
+    log.info(
+        "Updated WhatsMyName database: %d sites saved to %s", sites_count, target_path
+    )
+    return 0
 
 
 def _run_clear_cache() -> int:
@@ -230,8 +295,13 @@ def main(argv: list[str] | None = None) -> int:
     user_parser.add_argument("--aggressive-phone", action="store_true")
     user_parser.add_argument("--follow-domains", action="store_true")
 
-    # update-wmn-db
-    subparsers.add_parser("update-wmn-db", help="Download/update WhatsMyName database")
+    # update-wmn-db — honors --proxy/--insecure so the shared client's TLS
+    # and network settings travel with the download.
+    wmn_parser = subparsers.add_parser(
+        "update-wmn-db", help="Download/update WhatsMyName database"
+    )
+    wmn_parser.add_argument("--proxy", metavar="URL")
+    wmn_parser.add_argument("--insecure", action="store_true")
 
     # clear-cache
     subparsers.add_parser("clear-cache", help="Clear HTTP response cache")
@@ -258,7 +328,7 @@ def main(argv: list[str] | None = None) -> int:
         return _run_user(args)
 
     if args.command == "update-wmn-db":
-        return _run_update_wmn_db()
+        return _run_update_wmn_db(args)
 
     if args.command == "clear-cache":
         return _run_clear_cache()

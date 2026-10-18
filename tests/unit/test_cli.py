@@ -221,16 +221,165 @@ def test_clear_cache_removes_file(tmp_path):
 # ── update-wmn-db ─────────────────────────────────────────────────────────────
 
 
+# ── C1: _run_scan triggers autodiscover() ─────────────────────────────────────
+
+
+def test_corp_scan_calls_autodiscover(tmp_path):
+    """A real scan must trigger module autodiscovery or MODULE_REGISTRY stays
+    empty and the correlation engine runs with zero plugins."""
+    from tddt.cli import main
+
+    graph = _empty_graph()
+    with (
+        patch("tddt.cli.autodiscover") as mock_auto,
+        patch("tddt.cli.CorrelationEngine") as MockEngine,
+        patch("tddt.cli.export_json"),
+        patch("tddt.cli.load_settings"),
+        patch("tddt.cli.get_client"),
+    ):
+        MockEngine.return_value.scan.return_value = graph
+        main(["corp", "example.com", "-o", str(tmp_path / "out.json")])
+    mock_auto.assert_called()
+
+
+def test_user_scan_calls_autodiscover(tmp_path):
+    from tddt.cli import main
+
+    graph = _empty_graph()
+    with (
+        patch("tddt.cli.autodiscover") as mock_auto,
+        patch("tddt.cli.CorrelationEngine") as MockEngine,
+        patch("tddt.cli.export_json"),
+        patch("tddt.cli.load_settings"),
+        patch("tddt.cli.get_client"),
+    ):
+        MockEngine.return_value.scan.return_value = graph
+        main(["user", "--username", "foo", "-o", str(tmp_path / "out.json")])
+    mock_auto.assert_called()
+
+
+# ── C2: --format dispatches all exporters ─────────────────────────────────────
+
+
+def test_format_json_dispatches_only_export_json(tmp_path):
+    """Default -f rich,json fires export_json; md/html exporters stay silent."""
+    from tddt.cli import main
+
+    graph = _empty_graph()
+    with (
+        patch("tddt.cli.CorrelationEngine") as MockEngine,
+        patch("tddt.cli.export_json") as mock_json,
+        patch("tddt.cli.export_markdown") as mock_md,
+        patch("tddt.cli.export_html") as mock_html,
+        patch("tddt.cli.load_settings"),
+        patch("tddt.cli.get_client"),
+    ):
+        MockEngine.return_value.scan.return_value = graph
+        main(["corp", "example.com", "-o", str(tmp_path / "out.json")])
+    assert mock_json.called
+    assert not mock_md.called
+    assert not mock_html.called
+
+
+def test_format_json_md_html_dispatches_all_three(tmp_path):
+    """-f json,md,html must dispatch to each exporter with a path matching the format."""
+    from tddt.cli import main
+
+    graph = _empty_graph()
+    with (
+        patch("tddt.cli.CorrelationEngine") as MockEngine,
+        patch("tddt.cli.export_json") as mock_json,
+        patch("tddt.cli.export_markdown") as mock_md,
+        patch("tddt.cli.export_html") as mock_html,
+        patch("tddt.cli.load_settings"),
+        patch("tddt.cli.get_client"),
+    ):
+        MockEngine.return_value.scan.return_value = graph
+        main(
+            [
+                "corp",
+                "example.com",
+                "-f",
+                "json,md,html",
+                "-o",
+                str(tmp_path / "report.json"),
+            ]
+        )
+    assert mock_json.called
+    assert mock_md.called
+    assert mock_html.called
+    # Each exporter must get a path with the matching extension.
+    md_path: Path = mock_md.call_args.args[2]
+    html_path: Path = mock_html.call_args.args[2]
+    assert md_path.suffix == ".md"
+    assert html_path.suffix == ".html"
+
+
+# ── C3: profile wiring ────────────────────────────────────────────────────────
+
+
+def test_user_mode_passes_profile_to_export(tmp_path):
+    """User scan calls build_profile(graph) and passes it as profile= to export_json."""
+    from tddt.cli import main
+
+    graph = _empty_graph()
+    sentinel_profile = {"primary": {"services": []}, "alternates": []}
+    with (
+        patch("tddt.cli.CorrelationEngine") as MockEngine,
+        patch("tddt.cli.export_json") as mock_export,
+        patch("tddt.cli.load_settings"),
+        patch("tddt.cli.get_client"),
+        patch("tddt.cli.build_profile", return_value=sentinel_profile) as mock_build,
+    ):
+        MockEngine.return_value.scan.return_value = graph
+        ret = main(["user", "--username", "foo", "-o", str(tmp_path / "out.json")])
+    assert ret == 0
+    assert mock_build.called
+    call = mock_export.call_args
+    assert call.kwargs.get("profile") == sentinel_profile
+
+
+def test_corp_mode_does_not_build_profile(tmp_path):
+    """Corporate scan does not call build_profile."""
+    from tddt.cli import main
+
+    graph = _empty_graph()
+    with (
+        patch("tddt.cli.CorrelationEngine") as MockEngine,
+        patch("tddt.cli.export_json") as mock_export,
+        patch("tddt.cli.load_settings"),
+        patch("tddt.cli.get_client"),
+        patch("tddt.cli.build_profile") as mock_build,
+    ):
+        MockEngine.return_value.scan.return_value = graph
+        main(["corp", "example.com", "-o", str(tmp_path / "out.json")])
+    assert not mock_build.called
+    call = mock_export.call_args
+    assert call.kwargs.get("profile") is None
+
+
+# ── update-wmn-db ─────────────────────────────────────────────────────────────
+
+
 def test_update_wmn_db_downloads_json(tmp_path):
     import json
     import responses
     from tddt.cli import main
+    from tddt.core import http as http_module
+    from tddt.core.config import Settings
 
     target_file = tmp_path / "wmn.json"
     dummy_payload = json.dumps({"sites": [{"name": "Site1"}, {"name": "Site2"}]})
 
-    with responses.RequestsMock() as rsps, \
-         patch("tddt.cli._wmn_db_path", return_value=target_file):
+    http_module.reset_client()
+    no_cache_settings = Settings()
+    no_cache_settings.cache_enabled = False
+
+    with (
+        responses.RequestsMock() as rsps,
+        patch("tddt.cli._wmn_db_path", return_value=target_file),
+        patch("tddt.cli.load_settings", return_value=no_cache_settings),
+    ):
         rsps.add(
             responses.GET,
             "https://raw.githubusercontent.com/WebBreacher/WhatsMyName/main/wmn-data.json",
@@ -242,3 +391,33 @@ def test_update_wmn_db_downloads_json(tmp_path):
     assert ret == 0
     assert target_file.is_file()
     assert "Site1" in target_file.read_text()
+
+
+def test_update_wmn_db_uses_shared_http_client(tmp_path):
+    """update-wmn-db must route through the shared HttpClient so --insecure,
+    --proxy and cache settings apply. Bare `requests.get` bypasses all of that."""
+    from tddt.cli import main
+    from unittest.mock import MagicMock
+
+    target_file = tmp_path / "wmn.json"
+    mock_client = MagicMock()
+    mock_resp = MagicMock()
+    mock_resp.status_code = 200
+    mock_resp.content = b'{"sites": [{"name": "A"}]}'
+    mock_resp.json.return_value = {"sites": [{"name": "A"}]}
+    mock_client.get.return_value = mock_resp
+
+    with (
+        patch("tddt.cli._wmn_db_path", return_value=target_file),
+        patch("tddt.cli.load_settings"),
+        patch("tddt.cli.init_client", return_value=mock_client),
+        patch("tddt.cli.get_client", return_value=mock_client),
+    ):
+        ret = main(["update-wmn-db"])
+
+    assert ret == 0
+    mock_client.get.assert_called_once()
+    call_url = mock_client.get.call_args.args[0]
+    assert "WhatsMyName" in call_url
+    assert target_file.is_file()
+    assert "A" in target_file.read_text()

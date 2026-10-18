@@ -35,7 +35,8 @@ def settings_no_cache():
 def test_get_200_returns_response(settings_default, tmp_cache):
     responses.add(responses.GET, "https://example.test/ok", json={"ok": True}, status=200)
     client = HttpClient(settings_default, cache_path=tmp_cache)
-    r = client.get("https://example.test/ok", host_hint="rate_disabled.test")
+    client.rate_limiter.configure("example.test", 1e9)
+    r = client.get("https://example.test/ok")
     assert r.status_code == 200
     assert r.json() == {"ok": True}
 
@@ -79,8 +80,9 @@ def test_retry_backoff_factor(settings_no_cache, tmp_cache):
 def test_cache_hits_second_call(settings_default, tmp_cache):
     responses.add(responses.GET, "https://example.test/cached", json={"v": 1}, status=200)
     client = HttpClient(settings_default, cache_path=tmp_cache)
-    r1 = client.get("https://example.test/cached", host_hint="rate_disabled.test")
-    r2 = client.get("https://example.test/cached", host_hint="rate_disabled.test")
+    client.rate_limiter.configure("example.test", 1e9)
+    r1 = client.get("https://example.test/cached")
+    r2 = client.get("https://example.test/cached")
     assert r1.status_code == 200
     assert r2.status_code == 200
     assert len(responses.calls) == 1  # second call served from cache
@@ -91,8 +93,9 @@ def test_no_cache_when_disabled(settings_no_cache, tmp_cache):
     responses.add(responses.GET, "https://example.test/x", json={"v": 1}, status=200)
     responses.add(responses.GET, "https://example.test/x", json={"v": 2}, status=200)
     client = HttpClient(settings_no_cache, cache_path=tmp_cache)
-    client.get("https://example.test/x", host_hint="rate_disabled.test")
-    client.get("https://example.test/x", host_hint="rate_disabled.test")
+    client.rate_limiter.configure("example.test", 1e9)
+    client.get("https://example.test/x")
+    client.get("https://example.test/x")
     assert len(responses.calls) == 2
 
 
@@ -173,6 +176,32 @@ def test_get_client_requires_init():
     http_module.reset_client()
     with pytest.raises(RuntimeError):
         http_module.get_client()
+
+
+def test_no_rate_disabled_test_backdoor_in_source():
+    """The `rate_disabled.test` backdoor must not exist in production code."""
+    import inspect
+
+    from tddt.core import http as http_module
+
+    src = inspect.getsource(http_module)
+    assert "rate_disabled" not in src
+
+
+def test_debug_log_strips_query_string(settings_no_cache, tmp_cache, caplog):
+    """Debug log must not leak API keys / tokens from the URL query string."""
+    import logging
+
+    with responses.RequestsMock() as rsps:
+        rsps.add(responses.GET, "https://example.test/x", status=200)
+        client = HttpClient(settings_no_cache, cache_path=tmp_cache)
+        client.rate_limiter.configure("example.test", 1e9)
+        with caplog.at_level(logging.DEBUG, logger="tddt.core.http"):
+            client.get("https://example.test/x?api_key=SECRET123&other=val")
+    full = "\n".join(r.getMessage() for r in caplog.records)
+    assert "SECRET123" not in full
+    assert "api_key=" not in full
+    assert "https://example.test/x" in full
 
 
 def test_init_and_get_client_returns_same_instance(settings_default, tmp_cache):

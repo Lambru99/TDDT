@@ -80,6 +80,31 @@ def test_get_logger_returns_namespaced_logger():
     assert log.name == "tddt.modules.corporate.email.bing"
 
 
+def test_control_chars_escaped_in_console_handler():
+    """Review Focus #3: the console handler must also escape control chars,
+    otherwise an attacker-controlled value in a log line can inject ANSI
+    sequences into the user's terminal."""
+    setup_logging(0)
+    root = logging.getLogger()
+    console_h = next(
+        h for h in root.handlers if getattr(h, "_tddt_console_handler", False)
+    )
+    record = logging.LogRecord(
+        name="test.console",
+        level=logging.WARNING,
+        pathname="t.py",
+        lineno=1,
+        msg="safe \x1b[31mred\x1b[0m end",
+        args=(),
+        exc_info=None,
+    )
+    formatted = console_h.format(record)
+    assert "\x1b[31m" not in formatted
+    assert "\\x1b" in formatted
+    assert "safe" in formatted
+    assert "red" in formatted
+
+
 def test_setup_is_idempotent(tmp_path: Path):
     setup_logging(0, tmp_path)
     setup_logging(0, tmp_path)

@@ -223,6 +223,7 @@ class EntityGraph:
         self._by_type: dict[str, list[str]] = defaultdict(list)
         self._dispatched: set[tuple[str, str]] = set()
         self._max = max_entities_per_type
+        self._capped_warned: set[str] = set()
         self.metadata: dict[str, Any] = {}
 
     # ── Mutation ─────────────────────────────────────────────────────────────
@@ -233,9 +234,13 @@ class EntityGraph:
             return False
         type_name = type(entity).__name__
         if len(self._by_type[type_name]) >= self._max:
-            _log.warning(
-                "entity cap reached for type %s (max=%d); skipping", type_name, self._max
-            )
+            if type_name not in self._capped_warned:
+                _log.warning(
+                    "entity cap reached for type %s (max=%d); further adds silenced",
+                    type_name,
+                    self._max,
+                )
+                self._capped_warned.add(type_name)
             return False
         self._nodes[entity.id] = entity
         self._by_type[type_name].append(entity.id)
