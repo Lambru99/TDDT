@@ -1,4 +1,4 @@
-"""JSON exporter — stub; full implementation in Task 2.2."""
+"""JSON exporter — writes the stable schema defined in spec §10.2."""
 
 from __future__ import annotations
 
@@ -11,10 +11,28 @@ if TYPE_CHECKING:
 
 
 def export_json(graph: "EntityGraph", scan_meta: dict, path: Path) -> None:
-    """Write graph + scan_meta to *path* as a JSON file (Task 2.2 spec shape)."""
+    """Write *graph* + *scan_meta* to *path* as a JSON file.
+
+    Schema (top-level keys are stable):
+    {
+        "scan": {...},
+        "entities": {
+            "by_type": {"Domain": [...], ...},
+            "graph_edges": [{"parent_id": ..., "child_id": ..., "type": ...}, ...]
+        },
+        "profile": null  # populated by ProfileAggregator in user mode
+    }
+
+    Each entity dict carries: type, value, id, confidence, source_module,
+    parent_id, discovered_at, metadata — as defined in spec §10.2.
+    """
+    raw = graph.export()
     output = {
         "scan": scan_meta,
-        "entities": {"by_type": {}, "graph_edges": []},
+        "entities": {
+            "by_type": raw["by_type"],
+            "graph_edges": raw.get("edges", []),
+        },
         "profile": None,
     }
     path = Path(path)
