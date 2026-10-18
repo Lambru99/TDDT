@@ -8,12 +8,14 @@ import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from urllib.parse import urlparse
+
 from platformdirs import user_cache_dir
 
 from tddt.core.config import load_settings
 from tddt.core.engine import CorrelationEngine
-from tddt.core.entity import Domain, Email, FullName, Phone, Username
-from tddt.core.http import get_client
+from tddt.core.entity import Domain, Email, FullName, Phone, Username, Website
+from tddt.core.http import get_client, init_client
 from tddt.core.logger import get_logger, setup_logging
 from tddt.core.module import MODULE_REGISTRY, autodiscover
 from tddt.report.json_exporter import export_json
@@ -87,7 +89,11 @@ def _run_scan(
         cli_overrides["cache_enabled"] = False
 
     settings = load_settings(cli_overrides=cli_overrides)
-    client = get_client()
+    try:
+        client = get_client()
+    except RuntimeError:
+        cache_path = get_cache_path() if settings.cache_enabled else None
+        client = init_client(settings, cache_path=cache_path)
 
     engine = CorrelationEngine(client=client, settings=settings)
 
@@ -104,8 +110,34 @@ def _run_scan(
     scan_meta["finished_at"] = finished_at.isoformat()
     scan_meta["duration_s"] = (finished_at - started_at).total_seconds()
 
+    cross_mode_results: dict = {}
+    if mode == "user" and getattr(args, "follow_domains", False):
+        candidate_domains = set()
+        for entity in graph.all():
+            if isinstance(entity, Website):
+                parsed = urlparse(entity.value)
+                host = parsed.netloc.split(":")[0].lower()
+                if host.startswith("www."):
+                    host = host[4:]
+                if host and "." in host:
+                    candidate_domains.add(host)
+            elif isinstance(entity, Domain):
+                candidate_domains.add(entity.value.lower())
+
+        if candidate_domains:
+            corp_results = {}
+            for dom in sorted(candidate_domains):
+                corp_graph = engine.scan(
+                    seeds=[Domain(value=dom)],
+                    mode="corporate",
+                    allow_active=not args.light,
+                    keyless_only=args.only_keyless,
+                )
+                corp_results[dom] = corp_graph.export()
+            cross_mode_results["corporate"] = corp_results
+
     output_path = Path(args.output) if args.output else _default_output_path(target)
-    export_json(graph, scan_meta, output_path)
+    export_json(graph, scan_meta, output_path, cross_mode_results=cross_mode_results or None)
 
     return 0
 
