@@ -30,6 +30,8 @@ ENV_KEY_MAP: dict[str, str] = {
     "GRAYHAT_API_KEY": "grayhat",
     "GITHUB_TOKEN": "github",
     "PHOTON_PATH": "photon_path",
+    "HIBP_API_KEY": "hibp",
+    "DEHASHED_API_KEY": "dehashed",
 }
 
 
@@ -54,6 +56,8 @@ class Settings:
     grayhat: str | None = None
     github: str | None = None
     photon_path: str | None = None
+    hibp: str | None = None
+    dehashed: str | None = None
 
 
 def _clean(value: str | None) -> str | None:
